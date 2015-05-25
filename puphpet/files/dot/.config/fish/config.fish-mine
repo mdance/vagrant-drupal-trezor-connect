@@ -1,0 +1,5 @@
+alias d7r='cd /var/www'
+alias d7m='cd /var/www/sites/all/modules'
+alias d7t='cd /var/www/sites/all/themes'
+
+set -x XDEBUG_CONFIG "idekey=PHPSTORM"
