@@ -1,0 +1,51 @@
+[
+    {
+        "name": "bitcoin-php/bitcoin-ecdsa",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/BitcoinPHP/BitcoinECDSA.php.git",
+            "reference": "97bd735888a647241689107164469c65051de6ea"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/BitcoinPHP/BitcoinECDSA.php/zipball/97bd735888a647241689107164469c65051de6ea",
+            "reference": "97bd735888a647241689107164469c65051de6ea",
+            "shasum": ""
+        },
+        "require": {
+            "ext-gmp": "*",
+            "php": ">=5.4.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "4.1.*"
+        },
+        "time": "2015-05-10 00:56:18",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "BitcoinPHP\\BitcoinECDSA": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "unlicense"
+        ],
+        "authors": [
+            {
+                "name": "BitcoinPHP",
+                "email": "panda@panda.cat",
+                "homepage": "http://github.com/BitcoinPHP",
+                "role": "Developer"
+            }
+        ],
+        "description": "PHP library allowing to generate BTC addresses from private keys",
+        "homepage": "https://github.com/BitcoinPHP/BitcoinECDSA.php",
+        "keywords": [
+            "ECDSA",
+            "bitcoin"
+        ]
+    }
+]
