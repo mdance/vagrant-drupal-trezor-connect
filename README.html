@@ -1,0 +1,51 @@
+This virtual machine will allow you to test the <a href="http://drupal.org">drupal</a> <a href="https://github.com/trezor/connect" target="new">trezor connect</a> integration.
+
+If you do not have the bindfs, cachier, and hostmanager vagrant plugins, you can install them with the following commands:
+
+vagrant plugin install vagrant-bindfs
+vagrant plugin install vagrant-cachier
+vagrant plugin install vagrant-hostmanager
+
+Next, provision the vagrant instance:
+
+vagrant up
+
+If the vagrant-hostmanager plugin fails, you may have to manually add the /etc/hosts entry:
+
+## vagrant-hostmanager-start id: 9a3698f5-93f6-4fde-a941-9f5581f6a3e6
+192.168.56.101	tc.dev tc.dev *.tc.dev
+## vagrant-hostmanager-end
+
+Listed below are the access credentials for the configured vm:
+
+<h2>Drupal Details</h2>
+
+Website: http(s)://tc.dev
+Username: admin
+Password: password
+
+<h2>Testing Instructions</h2>
+
+In order to test the integration, you will first need to associate your trezor device with an account.
+
+This can be done two ways depending upon if you have an existing account:
+
+<h3>1. User Registration</h3>
+
+Click the <a href="http://tc.dev/user/register">Create new account</a> link, or visit <a href="http://tc.dev/user/register">http://tc.dev/user/register</a>.
+
+Click the Sign in with TREZOR link and complete the trezor connect authentication process.
+
+The authentication process performs an AJAX callback to store the authenticated details against your session.
+
+Next, complete the registration process to create your new user account and your trezor device will be linked to your new account.
+
+<h3>2. My Account > Authenticated Devices</h3>
+
+You can login to an existing account, and click the My Account link to view your profile page.
+
+Click the Authenticated Devices tab
+
+Click the Sign in with TREZOR link and complete the trezor connect authentication process to link your trezor device to your new account.
+
+To unlink a trezor device from your account, click the Forget Authentication Device button on the Authenticated Devices page.
