@@ -3,14 +3,14 @@ vagrantfile:
     vm:
         box: puphpet/ubuntu1404-x64
         box_url: puphpet/ubuntu1404-x64
-        hostname: drupal7.dev
+        hostname: tc.dev
         memory: '1024'
         cpus: '1'
         chosen_provider: virtualbox
         network:
             private_network: 192.168.56.101
             forwarded_port:
-                vflnp_kmiwnp55ckuj:
+                forwarded_port_ssh:
                     host: '6887'
                     guest: '22'
         post_up_message: ''
@@ -32,19 +32,28 @@ vagrantfile:
                     - '--hiera_config /vagrant/puphpet/puppet/hiera.yaml'
                     - '--parser future'
         synced_folder:
-            vflsf_e3zlkhtzwghk:
-                source: ./
+            synced_folder_webroot:
+                source: ./dev/webroot
                 target: /var/www
-                sync_type: default
+                sync_type: nfs
                 rsync:
-                    args:
-                        - '--verbose'
-                        - '--archive'
-                        - '-z'
-                    exclude:
-                        - .vagrant/
-                        - .git/
-                    auto: 'true'
+                    auto: 'false'
+                owner: www-data
+                group: www-data
+            synced_folder_files:
+                source: ./dev/files
+                target: /var/www/sites/default/files
+                sync_type: nfs
+                rsync:
+                    auto: 'false'
+                owner: www-data
+                group: www-data
+            synced_folder_private:
+                source: ./dev/private
+                target: /var/www/sites/default/files/private
+                sync_type: nfs
+                rsync:
+                    auto: 'false'
                 owner: www-data
                 group: www-data
         usable_port_range:
@@ -65,7 +74,13 @@ vagrantfile:
 server:
     install: '1'
     packages:
+        - ruby
+        - php-apc
+        - php5-memcache
+        - memcached
+        - php5-curl
         - vim
+        - htop
 users_groups:
     install: '1'
     groups: {  }
@@ -133,7 +148,7 @@ apache:
     settings:
         user: www-data
         group: www-data
-        default_vhost: true
+        default_vhost: false
         manage_user: false
         manage_group: false
         sendfile: 0
@@ -141,25 +156,18 @@ apache:
         - proxy_fcgi
         - rewrite
     vhosts:
-        av_2kh2iw8jqm5k:
-            servername: drupal7.dev
+        http:
+            servername: tc.dev
             serveraliases:
-                - '*.drupal7.dev'
-            docroot: /var/www/webroot
-            port: '443'
+                - '*.tc.dev'
+            docroot: /var/www
+            port: '80'
             setenv:
                 - 'APP_ENV dev'
-            custom_fragment: 'Redirect permanent / https://drupal7.dev/'
-            ssl: '0'
-            ssl_cert: ''
-            ssl_key: ''
-            ssl_chain: ''
-            ssl_certs_dir: ''
-            ssl_protocol: ''
-            ssl_cipher: ''
+            #custom_fragment: 'Redirect permanent / https://tc.dev/'
             directories:
-                avd_zcrqxzsnywp8:
-                    path: /var/www/webroot
+                webroot:
+                    path: /var/www
                     options:
                         - Indexes
                         - FollowSymlinks
@@ -170,12 +178,47 @@ apache:
                         - 'all granted'
                     custom_fragment: ''
                     files_match:
-                        avdfm_l7p5jbiquana:
+                        phpfiles:
                             path: \.php$
                             sethandler: 'proxy:fcgi://127.0.0.1:9000'
                             custom_fragment: ''
                             provider: filesmatch
                     provider: directory
+        https:
+            servername: tc.dev
+            serveraliases:
+                - '*.tc.dev'
+            docroot: /var/www
+            port: '443'
+            setenv:
+                - 'APP_ENV dev'
+            ssl: '1'
+            ssl_cert: ''
+            ssl_key: ''
+            ssl_chain: ''
+            ssl_certs_dir: ''
+            ssl_protocol: ''
+            ssl_cipher: ''
+            directories:
+                webroot:
+                    path: /var/www
+                    options:
+                        - Indexes
+                        - FollowSymlinks
+                        - MultiViews
+                    allow_override:
+                        - All
+                    require:
+                        - 'all granted'
+                    custom_fragment: ''
+                    files_match:
+                        phpfiles:
+                            path: \.php$
+                            sethandler: 'proxy:fcgi://127.0.0.1:9000'
+                            custom_fragment: ''
+                            provider: filesmatch
+                    provider: directory
+
 php:
     install: '1'
     settings:
@@ -186,7 +229,6 @@ php:
             - intl
             - mcrypt
             - curl
-            - bcmath
             - gd
             - gmp
             - imagick
@@ -197,8 +239,10 @@ php:
         pear:
             - Console_CommandLine
             - PHP_CodeSniffer
+            - console_table
         pecl:
             - pecl_http
+            - uploadprogress
     ini:
         display_errors: On
         error_reporting: '-1'
@@ -228,11 +272,12 @@ xdebug:
         xdebug.remote_enable: '1'
         xdebug.remote_handler: dbgp
         xdebug.remote_port: '9000'
+        xdebug.max_nesting_level: '1000'
 blackfire:
-    install: '1'
+    install: '0'
     settings:
-        server_id: d8108598-7a7a-4c5e-8f03-d0bccadc0931
-        server_token: 91bde3fa9350479ba84f90acab46b680142c0f6fe8154a649e82d0d2ddadfa93
+        server_id: 
+        server_token: 
         agent:
             http_proxy: ''
             https_proxy: ''
@@ -243,18 +288,18 @@ blackfire:
             log_file: ''
             log_level: '1'
 xhprof:
-    install: '1'
+    install: '0'
 wpcli:
     install: '0'
     version: v0.19.0
 drush:
     install: '1'
-    version: 7.0.0-alpha3
+    version: 7.0.0-alpha9
 ruby:
-    install: '1'
+    install: '0'
     versions: {  }
 python:
-    install: '1'
+    install: '0'
     packages: {  }
     versions: {  }
 nodejs:
@@ -279,20 +324,20 @@ mysql:
     install: '1'
     settings:
         version: '5.6'
-        root_password: f5da8cba97d97d591d814142c7c0a97c8f235b04a098c0ff21f866dfafe0e406
+        root_password: password
         override_options: {  }
     adminer: 0
     users:
-        mysqlnu_t8ns234nge6y:
-            name: website
-            password: 67ce30ff051b2b8a9f8eeb7e53385473600a9b225303830cece3514816b7d914
+        users_www:
+            name: www
+            password: password
     databases:
-        mysqlnd_cugsew2pqrr3:
+        databases_drupal7:
             name: drupal7
             sql: ''
     grants:
-        mysqlng_71598f1h38br:
-            user: website
+        grants_www:
+            user: www
             table: 'drupal7.*'
             privileges:
                 - SELECT
@@ -324,7 +369,7 @@ mongodb:
         port: '27017'
     databases: {  }
 redis:
-    install: '1'
+    install: '0'
     settings:
         conf_port: '6379'
 sqlite:
@@ -341,7 +386,7 @@ mailcatcher:
         mailcatcher_path: /usr/local/rvm/wrappers/default
         from_email_method: inline
 beanstalkd:
-    install: '1'
+    install: '0'
     settings:
         listenaddress: 0.0.0.0
         listenport: '13000'
@@ -365,8 +410,8 @@ elastic_search:
         version: 1.4.1
         java_install: true
 solr:
-    install: '1'
+    install: '0'
     settings:
         version: 4.10.2
-        port: '1000'
+        port: ''
 
